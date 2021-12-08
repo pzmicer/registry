@@ -9,12 +9,14 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-
 	_ "github.com/jackc/pgx/v4/stdlib"
-
 	"github.com/jmoiron/sqlx"
-
 	"github.com/joho/godotenv"
+
+	//_ "github.com/pzmicer/registry/docs"
+	_ "./docs"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Service struct {
@@ -34,7 +36,6 @@ type Method struct {
 }
 
 func getConnection() *sqlx.DB {
-	godotenv.Load()
 	db, err := sqlx.Connect("pgx", os.Getenv("DATABASE_URL"))
 	if err != nil {
 		log.Fatalln(err)
@@ -42,6 +43,9 @@ func getConnection() *sqlx.DB {
 	return db
 }
 
+// @Param name query string true "Service name"
+// @Success 200 {object} map[string]interface{} "Example \n {"result": true"}
+// @Router /checkService [get]
 func checkService(c *gin.Context) {
 	serviceName := c.Query("name")
 
@@ -68,10 +72,13 @@ func checkService(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"result:": false,
+		"result": false,
 	})
 }
 
+// @Param name query string true "Service name"
+// @Success 200 {object} Service
+// @Router /getServiceInfo [get]
 func getServiceInfo(c *gin.Context) {
 	serviceName := c.Query("name")
 
@@ -87,6 +94,8 @@ func getServiceInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, service)
 }
 
+// @Success 200 {array} Service
+// @Router /getServiceList [get]
 func getServiceList(c *gin.Context) {
 	db := getConnection()
 
@@ -98,6 +107,9 @@ func getServiceList(c *gin.Context) {
 	c.JSON(http.StatusOK, services)
 }
 
+// @Param service body Service  true "ID not required"
+// @Success 200 {object} string
+// @Router /addService [post]
 func addService(c *gin.Context) {
 	body, _ := ioutil.ReadAll(c.Request.Body)
 	var newService Service
@@ -115,11 +127,12 @@ func addService(c *gin.Context) {
 }
 
 func main() {
+	godotenv.Load()
 	router := gin.Default()
 	router.GET("/checkService", checkService)
 	router.GET("/getServiceInfo", getServiceInfo)
 	router.GET("/getServiceList", getServiceList)
 	router.POST("/addService", addService)
-
-	router.Run(":8080")
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }

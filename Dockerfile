@@ -12,6 +12,6 @@ COPY *.go ./
 
 RUN go build -o /registry-server
 
-EXPOSE 8080
+# EXPOSE ${PORT}
 
 CMD [ "/registry-server" ]
