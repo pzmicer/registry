@@ -13,8 +13,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 
-	//_ "github.com/pzmicer/registry/docs"
-	_ "./docs"
+	_ "github.com/pzmicer/registry/docs"
+	//_ "./docs"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )

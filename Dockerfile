@@ -10,8 +10,10 @@ RUN go mod download
 
 COPY *.go ./
 
+COPY docs/* ./docs/
+
 RUN go build -o /registry-server
 
-# EXPOSE ${PORT}
+EXPOSE ${PORT}
 
 CMD [ "/registry-server" ]
