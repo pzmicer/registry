@@ -14,25 +14,31 @@ import (
 	"github.com/joho/godotenv"
 
 	_ "github.com/pzmicer/registry/docs"
-	//_ "./docs"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Service struct {
-	ID       int    `db:"id" json:"id,omitempty"`
-	Name     string `db:"name" json:"name"`
-	Cost     string `db:"cost" json:"cost"`
-	Duration int    `db:"duration" json:"duration"`
-	Currency string `db:"currency" json:"currency"`
-	Url      string `db:"url" json:"url"`
-	Key      string `db:"key" json:"key"`
+	ID        int    `db:"id" json:"id,omitempty"`
+	Name      string `db:"name" json:"name"`
+	Cost      string `db:"cost" json:"cost"`
+	Duration  int    `db:"duration" json:"duration"`
+	Currency  string `db:"currency" json:"currency"`
+	Url       string `db:"url" json:"url"`
+	KeyMethod string `db:"key_method" json:"key_method"`
 }
 
-type Method struct {
-	ID        int `db:"id" json:"id,omitempty"`
-	Name      int `db:"method_name" json:"method_name"`
-	ServiceId int `db:"service_id" json:"service_id"`
+type ServiceNoID struct {
+	Name      string `db:"name" json:"name"`
+	Cost      string `db:"cost" json:"cost"`
+	Duration  int    `db:"duration" json:"duration"`
+	Currency  string `db:"currency" json:"currency"`
+	Url       string `db:"url" json:"url"`
+	KeyMethod string `db:"key_method" json:"key_method"`
+}
+
+type CheckResult struct {
+	Result bool `json:"result"`
 }
 
 func getConnection() *sqlx.DB {
@@ -44,35 +50,25 @@ func getConnection() *sqlx.DB {
 }
 
 // @Param name query string true "Service name"
-// @Success 200 {object} map[string]interface{} "Example \n {"result": true"}
+// @Success 200 {object} CheckResult
 // @Router /checkService [get]
 func checkService(c *gin.Context) {
 	serviceName := c.Query("name")
 
 	db := getConnection()
 
-	rows, err := db.Queryx("SELECT * FROM services")
+	service := Service{}
+	err := db.Get(&service, "SELECT * FROM services WHERE name = $1", serviceName)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
+		c.JSON(http.StatusOK, gin.H{
+			"result": false,
+		})
 		return
 	}
 
-	service := Service{}
-	for rows.Next() {
-		err := rows.StructScan(&service)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		if service.Name == serviceName {
-			c.JSON(http.StatusOK, gin.H{
-				"result": true,
-			})
-			return
-		}
-	}
-
 	c.JSON(http.StatusOK, gin.H{
-		"result": false,
+		"result": true,
 	})
 }
 
@@ -87,10 +83,11 @@ func getServiceInfo(c *gin.Context) {
 	service := Service{}
 	err := db.Get(&service, "SELECT * FROM services WHERE name = $1", serviceName)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		c.JSON(http.StatusOK, gin.H{})
+		return
 	}
 
-	service.ID = 0
 	c.JSON(http.StatusOK, service)
 }
 
@@ -100,19 +97,19 @@ func getServiceList(c *gin.Context) {
 	db := getConnection()
 
 	services := []Service{}
-	err := db.Select(&services, "SELECT (name, cost, duration, currency, url, key) FROM services")
+	err := db.Select(&services, "SELECT * FROM services")
 	if err != nil {
 		log.Fatalln(err)
 	}
 	c.JSON(http.StatusOK, services)
 }
 
-// @Param service body Service  true "ID not required"
-// @Success 200 {object} string
+// @Param service body ServiceNoID  true "Body parameter"
+// @Success 200
 // @Router /addService [post]
 func addService(c *gin.Context) {
 	body, _ := ioutil.ReadAll(c.Request.Body)
-	var newService Service
+	var newService ServiceNoID
 	err := json.Unmarshal(body, &newService)
 	if err != nil {
 		log.Fatalln(err)
@@ -120,8 +117,8 @@ func addService(c *gin.Context) {
 
 	db := getConnection()
 
-	db.NamedExec(`INSERT INTO services (name, cost, duration, currency, url, key) 
-		VALUES (:name, :cost, :duration, :currency, :url, :key)`, newService)
+	db.NamedExec(`INSERT INTO services (name, cost, duration, currency, url, key_method) 
+		VALUES (:name, :cost, :duration, :currency, :url, :key_method)`, newService)
 
 	c.Status(http.StatusOK)
 }

@@ -27,21 +27,18 @@ var doc = `{
             "post": {
                 "parameters": [
                     {
-                        "description": "ID not required",
+                        "description": "Body parameter",
                         "name": "service",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.Service"
+                            "$ref": "#/definitions/main.ServiceNoID"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
-                        }
+                        "description": ""
                     }
                 }
             }
@@ -59,7 +56,7 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "For example, \"result\": true",
+                        "description": "Example \\n {\"result\": true\"}",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -121,7 +118,30 @@ var doc = `{
                 "id": {
                     "type": "integer"
                 },
-                "key": {
+                "key_method": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.ServiceNoID": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "type": "string"
+                },
+                "currency": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "key_method": {
                     "type": "string"
                 },
                 "name": {

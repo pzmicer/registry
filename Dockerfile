@@ -14,6 +14,13 @@ COPY docs/* ./docs/
 
 RUN go build -o /registry-server
 
+
+FROM alpine
+
+WORKDIR /
+
+COPY --from=0 /registry-server /registry-server
+
 EXPOSE ${PORT}
 
-CMD [ "/registry-server" ]
+ENTRYPOINT [ "/registry-server" ]
