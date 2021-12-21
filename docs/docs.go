@@ -101,7 +101,7 @@ var doc = `{
             }
         },
         "/removeService": {
-            "post": {
+            "delete": {
                 "parameters": [
                     {
                         "type": "integer",

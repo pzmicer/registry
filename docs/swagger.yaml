@@ -87,7 +87,7 @@ paths:
               $ref: '#/definitions/main.Service'
             type: array
   /removeService:
-    post:
+    delete:
       parameters:
       - description: ID
         in: query

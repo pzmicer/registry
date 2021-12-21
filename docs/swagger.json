@@ -82,7 +82,7 @@
             }
         },
         "/removeService": {
-            "post": {
+            "delete": {
                 "parameters": [
                     {
                         "type": "integer",
