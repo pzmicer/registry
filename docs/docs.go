@@ -56,10 +56,9 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Example \\n {\"result\": true\"}",
+                        "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": true
+                            "$ref": "#/definitions/main.CheckResult"
                         }
                     }
                 }
@@ -100,9 +99,35 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/removeService": {
+            "post": {
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "main.CheckResult": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "type": "boolean"
+                }
+            }
+        },
         "main.Service": {
             "type": "object",
             "properties": {

@@ -1,4 +1,9 @@
 definitions:
+  main.CheckResult:
+    properties:
+      result:
+        type: boolean
+    type: object
   main.Service:
     properties:
       cost:
@@ -56,10 +61,9 @@ paths:
         type: string
       responses:
         "200":
-          description: 'Example \n {"result": true"}'
+          description: OK
           schema:
-            additionalProperties: true
-            type: object
+            $ref: '#/definitions/main.CheckResult'
   /getServiceInfo:
     get:
       parameters:
@@ -82,4 +86,15 @@ paths:
             items:
               $ref: '#/definitions/main.Service'
             type: array
+  /removeService:
+    post:
+      parameters:
+      - description: ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: ""
 swagger: "2.0"

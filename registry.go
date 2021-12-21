@@ -123,6 +123,19 @@ func addService(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// @Param id query int  true "ID"
+// @Success 200
+// @Router /removeService [post]
+func removeService(c *gin.Context) {
+	id := c.Query("id")
+
+	db := getConnection()
+
+	db.Exec("DELETE FROM services WHERE id = $1", id)
+
+	c.Status(http.StatusOK)
+}
+
 func main() {
 	godotenv.Load()
 	router := gin.Default()
@@ -130,6 +143,7 @@ func main() {
 	router.GET("/getServiceInfo", getServiceInfo)
 	router.GET("/getServiceList", getServiceList)
 	router.POST("/addService", addService)
+	router.POST("/removeService", removeService)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
