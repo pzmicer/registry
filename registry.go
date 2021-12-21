@@ -125,7 +125,7 @@ func addService(c *gin.Context) {
 
 // @Param id query int  true "ID"
 // @Success 200
-// @Router /removeService [post]
+// @Router /removeService [delete]
 func removeService(c *gin.Context) {
 	id := c.Query("id")
 
@@ -143,7 +143,7 @@ func main() {
 	router.GET("/getServiceInfo", getServiceInfo)
 	router.GET("/getServiceList", getServiceList)
 	router.POST("/addService", addService)
-	router.POST("/removeService", removeService)
+	router.DELETE("/removeService", removeService)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
